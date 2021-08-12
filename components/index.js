@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -8,10 +8,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Picker
 } from 'react-native';
 import Realm from 'realm';
-import {TODO_SCHEMA} from '../databases/allSchemas';
-import {checkInternetConnection} from 'react-native-offline';
+import { TODO_SCHEMA } from '../databases/allSchemas';
+import { checkInternetConnection } from 'react-native-offline';
 
 const TodoSchema = {
   name: TODO_SCHEMA,
@@ -20,13 +21,22 @@ const TodoSchema = {
     status: 'string?',
   },
 };
-
+function getRealmApp() {
+  const appId = 'test-off-reedt'; // Set Realm app ID here.
+  const appConfig = {
+    id: appId,
+    timeout: 10000,
+  };
+  return new Realm.App(appConfig);
+}
 const Main = () => {
   const [tasks, setTasks] = useState([]);
   const [name, setName] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('Đang xử lý');
+
   const [isConnected, setConnected] = useState(true);
-  const app = Realm.App.getApp('test-off-reedt');
+  const app = new Realm.App(getRealmApp());
+  // const app = Realm.App.getApp('test-off-reedt');
 
   // React.useEffect(() => {
   //   (async () => {
@@ -102,10 +112,10 @@ const Main = () => {
       });
     }
     setName('');
-    setStatus('');
+    setStatus('Đang xử lý');
   }, [name, status, app, isConnected]);
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     return (
       <View style={styles.itemBlock}>
         <Text style={styles.item}>{item.name}</Text>
@@ -119,24 +129,39 @@ const Main = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View>
+        <View style={styles.content}>
+          <Text style={styles.content}>TodoList</Text>
+        </View>
+        <View style={styles.wrapper}>
+
+          <Text style={styles.titleInput}>Tên công việc</Text>
           <TextInput
             style={styles.input}
             onChangeText={setName}
             value={name}
-            placeholder="name"
+            placeholder="Nhập tên công việc"
           />
-          <TextInput
-            style={styles.input}
-            onChangeText={setStatus}
-            value={status}
-            placeholder="status"
-          />
-          <View>
+          <Text style={styles.titleInput}>Trạng thái</Text>
+
+          <Picker
+            selectedValue={status}
+            onValueChange={(itemValue, itemIndex) => setStatus(itemValue)}
+            style={styles.select}
+          >
+            <Picker.Item label="Chưa hoàn thành" value="Chưa hoàn thành" />
+            <Picker.Item label="Đang xử lý" value="Đang xử lý" />
+            <Picker.Item label="Đã hoàn thành" value="Đã hoàn thành" />
+          </Picker>
+
+          <View style={styles.text}>
             <TouchableOpacity style={styles.touchable} onPress={onSave}>
               <Text style={styles.text}>Save</Text>
             </TouchableOpacity>
           </View>
+        </View>
+        <View  style={styles.itemBlock}>
+          <Text style={styles.item}>Tên công việc</Text>
+          <Text style={styles.item}>Trạng thái</Text>
         </View>
         <FlatList
           data={tasks}
@@ -163,6 +188,8 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     padding: 10,
+    fontSize: 16
+
   },
   active: {
     color: 'green',
@@ -175,22 +202,47 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    marginTop: 5,
+    borderWidth: 1,
+    borderRadius: 5,
   },
   touchable: {
-    padding: 10,
+    padding: 8,
     margin: 10,
-    width: 100,
-    backgroundColor: 'green',
+    width: "30%",
+    backgroundColor: 'orange',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 10
   },
   text: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     color: '#fff',
+    fontSize: 19,
+    fontWeight: "600",
   },
+  select: {
+    padding: 10,
+    margin: 6,
+    marginTop: 0
+  },
+  titleInput: {
+    paddingLeft: 12,
+    paddingBottom: 0,
+  },
+  wrapper: {
+    marginTop: 20
+  },
+  content: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 20,
+    padding: 10
+  }
 });
 
 export default Main;
