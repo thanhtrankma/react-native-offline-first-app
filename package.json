@@ -10,8 +10,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/netinfo": "^6.0.0",
     "react": "17.0.1",
-    "react-native": "0.64.2",
+    "react-native": "^0.64.2",
+    "react-native-offline": "^5.8.0",
     "react-native-popup-dialog": "^0.18.3",
     "react-native-swipeout": "^2.3.6",
     "realm": "^10.6.1"
